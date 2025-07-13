@@ -1,0 +1,93 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local TweenService = game:GetService("TweenService")
+local UIS = game:GetService("UserInputService")
+
+-- Create GUI
+local gui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
+gui.Name = "CustomLoading"
+gui.IgnoreGuiInset = true
+gui.ResetOnSpawn = false
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Background Frame
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(1, 0, 1, 0)
+frame.BackgroundColor3 = Color3.new(0, 0, 0)
+frame.BackgroundTransparency = 1
+frame.ZIndex = 10
+
+-- Tween fade-in
+TweenService:Create(frame, TweenInfo.new(1), { BackgroundTransparency = 0 }):Play()
+
+-- Loading Text
+local label = Instance.new("TextLabel", frame)
+label.Size = UDim2.new(0.6, 0, 0.1, 0)
+label.Position = UDim2.new(0.2, 0, 0.4, 0)
+label.BackgroundTransparency = 1
+label.TextColor3 = Color3.new(1, 1, 1)
+label.TextScaled = true
+label.Font = Enum.Font.GothamBold
+label.Text = "Loading..."
+
+-- Countdown Text
+local countdown = Instance.new("TextLabel", frame)
+countdown.Size = UDim2.new(0.6, 0, 0.08, 0)
+countdown.Position = UDim2.new(0.2, 0, 0.5, 0)
+countdown.BackgroundTransparency = 1
+countdown.TextColor3 = Color3.new(1, 1, 1)
+countdown.TextScaled = true
+countdown.Font = Enum.Font.Gotham
+countdown.Text = ""
+
+-- Skip Button
+local skipBtn = Instance.new("TextButton", frame)
+skipBtn.Size = UDim2.new(0.3, 0, 0.08, 0)
+skipBtn.Position = UDim2.new(0.35, 0, 0.65, 0)
+skipBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+skipBtn.TextColor3 = Color3.new(1, 1, 1)
+skipBtn.TextScaled = true
+skipBtn.Text = "Skip"
+skipBtn.Font = Enum.Font.GothamBold
+skipBtn.Visible = false
+skipBtn.AutoButtonColor = true
+skipBtn.ZIndex = 11
+skipBtn.BackgroundTransparency = 0.2
+skipBtn.ClipsDescendants = true
+skipBtn.AnchorPoint = Vector2.new(0, 0)
+
+-- Countdown Logic
+local timeLeft = 15
+local skip = false
+
+-- Show skip button after 5s
+task.delay(5, function()
+skipBtn.Visible = true
+end)
+
+-- Skip button logic
+skipBtn.MouseButton1Click:Connect(function()
+skip = true
+timeLeft = 0
+end)
+
+-- Countdown display
+task.spawn(function()
+while timeLeft > 0 do
+countdown.Text = "Starting in " .. timeLeft .. "s"
+timeLeft -= 1
+wait(1)
+end
+end)
+
+-- Wait for time or skip
+repeat wait(0.1) until timeLeft <= 0
+
+-- Fade out
+TweenService:Create(frame, TweenInfo.new(1), { BackgroundTransparency = 1 }):Play()
+TweenService:Create(label, TweenInfo.new(1), { TextTransparency = 1 }):Play()
+TweenService:Create(countdown, TweenInfo.new(1), { TextTransparency = 1 }):Play()
+TweenService:Create(skipBtn, TweenInfo.new(1), { TextTransparency = 1, BackgroundTransparency = 1 }):Play()
+
+wait(1.2)
+gui:Destroy()
